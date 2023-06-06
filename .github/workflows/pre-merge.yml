@@ -45,6 +45,10 @@ concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  ORG_GRADLE_PROJECT_githubPackagesUsername: kyhule
+  ORG_GRADLE_PROJECT_githubPackagesPassword: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     runs-on: ${{ inputs.runner }}
