@@ -69,13 +69,13 @@ on:
         description: "Publishes maven artifacts."
         required: false
         type: boolean
-        default: false
+        default: true
 
       publish-release:
         description: "Publishes a GitHub Release."
         required: false
         type: boolean
-        default: false
+        default: true
 
 concurrency:
   group: build-${{ github.ref }}
