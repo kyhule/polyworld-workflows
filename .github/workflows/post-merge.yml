@@ -155,8 +155,6 @@ jobs:
           --no-configuration-cache
           -Preckon.scope=${{ inputs.version-scope }}
           -Preckon.stage=${{ inputs.version-stage }}
-          -PgithubPackagesUsername=kyhule
-          -PartifactoryPassword=${{ secrets.CLCLIENT_ARTIFACTORY_PASSWORD }}
 
       - name: Release
         if: ${{ inputs.version-stage == 'final' && inputs.publish-release }}
