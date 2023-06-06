@@ -1,0 +1,163 @@
+name: Post-merge
+
+on:
+  workflow_call:
+
+    inputs:
+
+      runner:
+        description: "Name of runner to use for this workflow."
+        required: false
+        type: string
+        default: 'ubuntu-latest'
+
+      checkout-fetch-depth:
+        description: "Fetch depth of the checkout."
+        required: false
+        type: number
+        default: 0
+
+      version-scope:
+        description: "Valid values: `major`, `minor`, `patch`."
+        required: false
+        type: string
+        default: 'minor'
+
+      version-stage:
+        description: "Valid values: `snapshot`, `final`."
+        required: false
+        type: string
+        default: 'snapshot'
+
+      java-version:
+        description: "The java version to use."
+        required: false
+        type: number
+        default: 17
+
+      setup-android:
+        description: "Sets up android sdk home."
+        required: false
+        type: boolean
+        default: true
+
+      build-tasks:
+        description: "Gradle tasks to execute during build step."
+        required: false
+        type: string
+        default: 'build'
+
+      build-args:
+        description: "Gradle arguments to pass with task execution."
+        required: false
+        type: string
+        default: '--no-configuration-cache'
+
+      android-archive-app-outputs:
+        description: "Archives android app module build output."
+        required: false
+        type: boolean
+        default: false
+
+      android-archive-app-reports:
+        description: "Archives android app module report output."
+        required: false
+        type: boolean
+        default: false
+
+      publish-artifacts:
+        description: "Publishes maven artifacts."
+        required: false
+        type: boolean
+        default: false
+
+      publish-release:
+        description: "Publishes a GitHub Release."
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: build-${{ github.ref }}
+
+jobs:
+  build:
+    runs-on: ${{ inputs.runner }}
+
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: ${{ inputs.checkout-fetch-depth }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: ${{ inputs.java-version }}
+
+      - name: Set up Android
+        uses: android-actions/setup-android@v2
+
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          gradle-home-cache-cleanup: true
+
+      - name: Build and Test
+        run: >
+          ./gradlew
+          ${{ inputs.build-tasks }}
+          ${{ inputs.build-args }}
+          -Preckon.scope=${{ inputs.version-scope }}
+          -Preckon.stage=${{ inputs.version-stage }}
+
+      - name: Check test output existence
+        id: check_test_output
+        uses: andstor/file-existence-action@v2
+        if: success() || failure()
+        with:
+          files: '**/build/test-results/**/*.xml'
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: steps.check_test_outputs.file_exists == 'true'
+        with:
+          name: Junit Tests
+          path: '**/build/test-results/**/*.xml'
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: Upload build outputs (APKs)
+        uses: actions/upload-artifact@v3
+        if: ${{ inputs.android-archive-app-outputs }}
+        with:
+          name: build-outputs
+          path: app/build/outputs
+
+      - name: Upload build reports
+        if: ${{ inputs.android-archive-app-reports }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-reports
+          path: app/build/reports
+
+      - name: Publish
+        if: ${{ inputs.publish-artifacts }}
+        run: >
+          ./gradlew
+          publish
+          --no-configuration-cache
+          -Preckon.scope=${{ inputs.version-scope }}
+          -Preckon.stage=${{ inputs.version-stage }}
+          -PgithubPackagesUsername=kyhule
+          -PartifactoryPassword=${{ secrets.CLCLIENT_ARTIFACTORY_PASSWORD }}
+
+      - name: Release
+        if: ${{ inputs.version-stage == 'final' && inputs.publish-release }}
+        run: >
+          ./gradlew
+          githubRelease 
+          --no-configuration-cache
+          -Preckon.scope=${{ inputs.version-scope }}
+          -Preckon.stage=${{ inputs.version-stage }}
