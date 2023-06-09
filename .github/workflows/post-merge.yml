@@ -158,9 +158,11 @@ jobs:
 
       - name: Release
         if: ${{ inputs.version-stage == 'final' && inputs.publish-release }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           ./gradlew
-          githubRelease 
+          githubRelease
           --no-configuration-cache
           -Preckon.scope=${{ inputs.version-scope }}
           -Preckon.stage=${{ inputs.version-stage }}
