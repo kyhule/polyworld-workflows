@@ -42,7 +42,7 @@ on:
         default: '--no-configuration-cache'
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: 'pre-merge-${{ github.event.merge_group.head_ref || github.head_ref }}-${{ github.workflow }}'
   cancel-in-progress: true
 
 env:
