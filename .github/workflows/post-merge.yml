@@ -101,7 +101,7 @@ jobs:
           java-version: ${{ inputs.java-version }}
 
       - name: Set up Android
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
         if: ${{ inputs.setup-android }}
 
       - name: Set up Gradle
