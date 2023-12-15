@@ -134,7 +134,7 @@ jobs:
           fail-on-error: false
 
       - name: Upload build outputs (APKs)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ inputs.android-archive-app-outputs }}
         with:
           name: build-outputs
@@ -142,7 +142,7 @@ jobs:
 
       - name: Upload build reports
         if: ${{ inputs.android-archive-app-reports }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-reports
           path: app/build/reports
