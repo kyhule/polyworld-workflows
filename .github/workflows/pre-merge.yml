@@ -56,22 +56,23 @@ jobs:
     steps:
 
       - name: Checkout the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
         with:
           distribution: 'zulu'
-          java-version: ${{ inputs.java-version }}
+          java-version: 17
 
-      - name: Set up Android
-        uses: android-actions/setup-android@v3
-        if: ${{ inputs.setup-android }}
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@00854ea68c109d98c75d956347303bf7c45b0277 # v3.2.1
+        with:
+          log-accepted-android-sdk-licenses: false
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - name: Build and Test
         run: >
@@ -79,18 +80,12 @@ jobs:
           ${{ inputs.build-tasks }}
           ${{ inputs.build-args }}
 
-      - name: Check test output existence
-        id: check_test_output
-        uses: andstor/file-existence-action@v3
+      - name: Test Report
+        uses: dorny/test-reporter@31a54ee7ebcacc03a09ea97a7e5465a47b84aea5 # v1.9.1
         if: success() || failure()
         with:
-          files: '**/build/test-results/**/*.xml'
-
-      - name: Test Report
-        uses: dorny/test-reporter@v1
-        if: steps.check_test_outputs.file_exists == 'true'
-        with:
-          name: Junit Tests
+          name: Junit Reports
           path: '**/build/test-results/**/*.xml'
           reporter: java-junit
+          fail-on-empty: false
           fail-on-error: false
