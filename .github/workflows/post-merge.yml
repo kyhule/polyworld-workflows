@@ -128,7 +128,7 @@ jobs:
           fail-on-error: false
 
       - name: Upload build outputs (APKs)
-        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         if: ${{ inputs.android-archive-app-outputs }}
         with:
           name: build-outputs
@@ -136,7 +136,7 @@ jobs:
 
       - name: Upload build reports
         if: ${{ inputs.android-archive-app-reports }}
-        uses: actions/upload-artifact@89ef406dd8d7e03cfd12d9e0a4a378f454709029 # v4.3.5
+        uses: actions/upload-artifact@834a144ee995460fba8ed112a2fc961b36a5ec5a # v4.3.6
         with:
           name: build-reports
           path: app/build/reports
