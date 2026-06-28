@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/cupcake@1fc052d03c7a43c78fe0fee19c9d648b749e0c01 # v8.3.0
+        uses: oxsecurity/megalinter/flavors/cupcake@ef3e84b8b836d76db562d0f3ed7da61e8fd538bc # v9.6.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SPELL_CSPELL_DISABLE_ERRORS: true
