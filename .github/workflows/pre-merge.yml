@@ -61,7 +61,7 @@ jobs:
           fetch-depth: ${{ inputs.checkout-fetch-depth }}
 
       - name: Set up Java
-        uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
         with:
           distribution: 'zulu'
           java-version: 17
